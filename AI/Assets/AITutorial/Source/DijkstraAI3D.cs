@@ -3,20 +3,26 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
+public enum PathFindingType{
+	Astar,
+	Dijkstra
+}
+
 public class DijkstraAI3D : MonoBehaviour {
-	
-	public Color startColor = Color.green;
-	public Color endColor = Color.red;
-	public Color unvisitedColor = Color.white;
-	public Color visitedColor = Color.gray;
-	public Color processingColor = Color.yellow;
-	public Color pathColor = Color.green;
+
+	public PathFindingType pathFindingType = PathFindingType.Astar;
+	public Material startNodeMaterial;
+	public Material endNodeMaterial;
+	public Material unvisitedNodeMaterial;
+	public Material visitedNodeMaterial;
+	public Material processingNodeMaterial;
+	public Material pathNodeMaterial;
 	public LineRenderer lineRenderer;
 	public GameObject mainCamera;
 
-	int width = 20;
-	int height = 10;
-	int depth = 10;
+	int width = 15;
+	int height = 15;
+	int depth = 15;
 
 	PathNode startingPathNode;
 	PathNode endingPathNode;
@@ -52,21 +58,23 @@ public class DijkstraAI3D : MonoBehaviour {
 		PathNode currentNode = startingPathNode;
 		bool pathFound = false;
 		float nodeSearchDistance = 0;
-		float total = 0;
 		List<PathNode> processingNodes = new List<PathNode>();
 
 		inProgress = true;
 
 		while(!pathFound && inProgress){
 			for(int i = 0; i < pathNodes.Count; i++){
+				float distance;
 
-				float distance = Vector3.Distance(currentNode.transform.position, pathNodes[i].transform.position); // A* like
-//				float distance = Vector3.Distance(startingPathNode.transform.position, pathNodes[i].transform.position); //Dijkstra like
+				if(pathFindingType == PathFindingType.Astar)
+					distance = Vector3.Distance(currentNode.transform.position, pathNodes[i].transform.position); // A* like
+				else
+					distance = Vector3.Distance(startingPathNode.transform.position, pathNodes[i].transform.position); //Dijkstra like
 				
 				if(distance < nodeSearchDistance){
 					processingNodes.Add(pathNodes[i]);
 					if(currentNode != startingPathNode)
-						currentNode.renderer.material.color = processingColor;
+						currentNode.renderer.material = processingNodeMaterial;
 				}
 			}
 
@@ -78,11 +86,10 @@ public class DijkstraAI3D : MonoBehaviour {
 						break;
 					}
 					
-					node.renderer.material.color = visitedColor;
+					node.renderer.material = visitedNodeMaterial;
 					if(node.weight < smallestWeight){
 						smallestWeight = node.weight;
 						currentNode = node;
-//						nodeSearchDistance = 0; //uncomment for a*
 						pathNodes.Remove(currentNode);
 					}
 				}
@@ -96,7 +103,7 @@ public class DijkstraAI3D : MonoBehaviour {
 		}
 
 		foreach(PathNode pathNode in path){
-			pathNode.renderer.material.color = pathColor;
+			pathNode.renderer.material = pathNodeMaterial;
 		}
 
 		path.Add(endingPathNode);
@@ -134,7 +141,7 @@ public class DijkstraAI3D : MonoBehaviour {
 					for(int k = 0; k < z; k++){
 						GameObject node = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 						node.transform.position = new Vector3(i, j, k);
-						PathNode pathNode = node.AddComponent<PathNode>();
+						node.AddComponent<PathNode>();
 						node.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 					}
 				}
@@ -154,19 +161,17 @@ public class DijkstraAI3D : MonoBehaviour {
 		endingPathNode = pathNodes[Random.Range(0, pathNodes.Count -1)];
 		
 		foreach(PathNode node in pathNodes){
-			node.renderer.material.shader = Shader.Find("Transparent/Diffuse");
-			
 			if(node == startingPathNode){
 				node.weight = 0;
-				node.renderer.material.color = startColor;
+				node.renderer.material = startNodeMaterial;
 			}
 			else if(node == endingPathNode){
 				node.weight = Mathf.Infinity;
-				node.renderer.material.color = endColor;
+				node.renderer.material = endNodeMaterial;
 			}
 			else{
 				node.weight = Random.Range(0.0f,10.0f);
-				node.renderer.material.color = unvisitedColor;
+				node.renderer.material = unvisitedNodeMaterial;
 			}
 		}
 		
