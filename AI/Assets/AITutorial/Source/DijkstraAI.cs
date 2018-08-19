@@ -5,54 +5,67 @@ using System.Linq;
 
 public class DijkstraAI : MonoBehaviour {
 	
-	public Color startColor = Color.green;
-	public Color endColor = Color.red;
-	public Color unvisitedColor = Color.white;
-	public Color visitedColor = Color.gray;
-	public Color processingColor = Color.yellow;
-	public Color pathColor = Color.green;
-	public LineRenderer lineRenderer;
+    [SerializeField] private int width = 20;
+    [SerializeField] private int height = 10;
+    [SerializeField] private bool randomStartingPosition = true;
+    [SerializeField] private bool randomEndingPosition = true;
 
-	int width = 20;
-	int height = 10;
+    [SerializeField] private Color startColor = Color.green;
+    [SerializeField] private Color endColor = Color.red;
+    [SerializeField] private Color unvisitedColor = Color.white;
+    [SerializeField] private Color visitedColor = Color.gray;
+    [SerializeField] private Color processingColor = Color.yellow;
+    [SerializeField] private Color pathColor = Color.green;
+    [SerializeField] private LineRenderer lineRenderer;
 
-	PathNode startingPathNode;
-	PathNode endingPathNode;
+	private PathNode startingPathNode;
+    private PathNode endingPathNode;
 
-	List<PathNode> pathNodes = new List<PathNode>();
-	List<PathNode> path = new List<PathNode>();
+    private List<PathNode> pathNodes = new List<PathNode>();
+    private List<PathNode> path = new List<PathNode>();
 
-	bool pathCompleted;
+    private bool pathCompleted;
 
-	// Use this for initialization
-	void Start () {
+    private void Start () 
+    {
 		CreatePathNodes(width,height);
 
 		pathNodes = GameObject.FindObjectsOfType<PathNode>().ToList();
 
-//		startingPathNode = pathNodes[Random.Range(0, pathNodes.Count)];
-//		endingPathNode = pathNodes[Random.Range (0, pathNodes.Count)];
+        if(randomStartingPosition)
+        {
+            startingPathNode = pathNodes[Random.Range(0, pathNodes.Count)];
+        }
+        else
+        {
+            startingPathNode = pathNodes[0];
+        }
 
-		// Uncomment to make the starting node and ending node the first and last node in the array.
-//		startingPathNode = pathNodes[0];
-//		endingPathNode = pathNodes[pathNodes.Count - 1];
+        if(randomEndingPosition)
+        {
+            endingPathNode = pathNodes[Random.Range (0, pathNodes.Count)];
+        }
+        else
+        {
+            endingPathNode = pathNodes[pathNodes.Count - 1];
+        }
 
-		// Uncomment to make the starting node and ending node random
-		startingPathNode = pathNodes[Random.Range(0, pathNodes.Count -1)];
-		endingPathNode = pathNodes[Random.Range(0, pathNodes.Count -1)];
-
-		foreach(PathNode node in pathNodes){
-			if(node == startingPathNode){
+		foreach(PathNode node in pathNodes)
+        {
+			if(node == startingPathNode)
+            {
 				node.weight = 0;
-				node.renderer.material.color = startColor;
+				node.GetComponent<Renderer>().material.color = startColor;
 			}
-			else if(node == endingPathNode){
+			else if(node == endingPathNode)
+            {
 				node.weight = Mathf.Infinity;
-				node.renderer.material.color = endColor;
+				node.GetComponent<Renderer>().material.color = endColor;
 			}
-			else{
+			else
+            {
 				node.weight = Random.Range(0.0f,10.0f);
-				node.renderer.material.color = unvisitedColor;
+				node.GetComponent<Renderer>().material.color = unvisitedColor;
 			}
 		}
 
@@ -61,51 +74,65 @@ public class DijkstraAI : MonoBehaviour {
 		StartCoroutine(FindPath());
 	}
 
-	void Update(){
-		if(pathCompleted || Input.GetKeyDown(KeyCode.R)){
+    private void Update()
+    {
+		if(pathCompleted || Input.GetKeyDown(KeyCode.R))
+        {
 			Application.LoadLevel(0);
 			pathCompleted = false;
 		}
 
 		lineRenderer.SetVertexCount(path.Count);
-		for(int i = 0; i < path.Count; i++){
+
+		for(int i = 0; i < path.Count; i++)
+        {
 			lineRenderer.SetPosition(i, path[i].transform.localPosition);
 		}
 	}
 
-	IEnumerator FindPath(){
+    private IEnumerator FindPath()
+    {
 		PathNode currentNode = startingPathNode;
 		bool pathFound = false;
 		float nodeSearchDistance = 0;
 		float total = 0;
 		List<PathNode> processingNodes = new List<PathNode>();
 
-		while(!pathFound){
-			for(int i = 0; i < pathNodes.Count; i++){
-
+		while(!pathFound)
+        {
+			for(int i = 0; i < pathNodes.Count; i++)
+            {
 				float distance = Vector3.Distance(currentNode.transform.position, pathNodes[i].transform.position); // A* like
-//				float distance = Vector3.Distance(startingPathNode.transform.position, pathNodes[i].transform.position); //Dijkstra like
+				//float distance = Vector3.Distance(startingPathNode.transform.position, pathNodes[i].transform.position); //Dijkstra like
 				
-				if(distance < nodeSearchDistance){
+				if(distance < nodeSearchDistance)
+                {
 					processingNodes.Add(pathNodes[i]);
-					if(currentNode != startingPathNode)
-						currentNode.renderer.material.color = processingColor;
+                    if (currentNode != startingPathNode)
+                    {
+                        currentNode.GetComponent<Renderer>().material.color = processingColor;
+                    }
 				}
 			}
 
-			if(processingNodes.Count > 0){
+			if(processingNodes.Count > 0)
+            {
 				float smallestWeight = Mathf.Infinity;
-				foreach(PathNode node in processingNodes){
-					if(node == endingPathNode){
+				foreach(PathNode node in processingNodes)
+                {
+					if(node == endingPathNode)
+                    {
 						pathFound = true;
 						break;
 					}
 					
-					node.renderer.material.color = visitedColor;
-					if(node.weight < smallestWeight){
+					node.GetComponent<Renderer>().material.color = visitedColor;
+
+					if(node.weight < smallestWeight)
+                    {
 						smallestWeight = node.weight;
 						currentNode = node;
-//						nodeSearchDistance = 0; //uncomment for a*
+						//nodeSearchDistance = 0; //uncomment for a*
 						pathNodes.Remove(currentNode);
 					}
 				}
@@ -118,8 +145,9 @@ public class DijkstraAI : MonoBehaviour {
 			yield return new WaitForSeconds(0.05f);
 		}
 
-		foreach(PathNode pathNode in path){
-			pathNode.renderer.material.color = pathColor;
+		foreach(PathNode pathNode in path)
+        {
+			pathNode.GetComponent<Renderer>().material.color = pathColor;
 		}
 
 		path.Add(endingPathNode);
@@ -129,13 +157,17 @@ public class DijkstraAI : MonoBehaviour {
 		yield return null;
 	}
 
-	IEnumerator TravelPath(){
+    private IEnumerator TravelPath()
+    {
 		int index = 0;
-		while(index < path.Count){
+		while(index < path.Count)
+        {
 			startingPathNode.transform.position = Vector3.MoveTowards(startingPathNode.transform.position, path[index].transform.position, 10f * Time.deltaTime);
 
-			if(startingPathNode.transform.position == path[index].transform.position)
-				index++;
+            if (startingPathNode.transform.position == path[index].transform.position)
+            {
+                index++;
+            }
 
 			yield return new WaitForSeconds(0.01f);
 		}
@@ -143,9 +175,12 @@ public class DijkstraAI : MonoBehaviour {
 		pathCompleted = true;
 	}
 
-	void CreatePathNodes(int x, int y){
-		for(int i = 0; i < x; i++){
-			for(int j = 0; j < y; j++){
+    private void CreatePathNodes(int x, int y)
+    {
+		for(int i = 0; i < x; i++)
+        {
+			for(int j = 0; j < y; j++)
+            {
 				GameObject node = GameObject.CreatePrimitive(PrimitiveType.Sphere);
 				node.transform.position = new Vector3(i,j);
 				PathNode pathNode = node.AddComponent<PathNode>();
@@ -154,8 +189,3 @@ public class DijkstraAI : MonoBehaviour {
 		}
 	}
 }
-
-
-
-
-

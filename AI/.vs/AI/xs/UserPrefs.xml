@@ -1,0 +1,16 @@
+﻿<Properties StartupConfiguration="{B3C401E3-0B46-F31E-904E-DC08456CB035}|">
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="Unity.Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/AITutorial/Source/DijkstraAI.cs">
+    <Files>
+      <File FileName="Assets/AITutorial/Source/SimpleAI.cs" Line="1" Column="1" />
+      <File FileName="Assets/AITutorial/Source/PathNode.cs" Line="1" Column="1" />
+      <File FileName="Assets/AITutorial/Source/DijkstraAI.cs" Line="157" Column="1" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MultiItemStartupConfigurations />
+</Properties>

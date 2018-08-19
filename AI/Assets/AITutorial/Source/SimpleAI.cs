@@ -4,11 +4,11 @@ using System.Collections;
 public class SimpleAI : MonoBehaviour {
 
 	public GameObject goTo;
-	NavMeshAgent navMeshAgent;
+	UnityEngine.AI.NavMeshAgent navMeshAgent;
 
 	// Use this for initialization
 	void Start () {
-		navMeshAgent = this.GetComponent<NavMeshAgent>();
+		navMeshAgent = this.GetComponent<UnityEngine.AI.NavMeshAgent>();
 	}
 
 	void Update(){
