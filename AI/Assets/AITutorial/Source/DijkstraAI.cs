@@ -9,6 +9,7 @@ public class DijkstraAI : MonoBehaviour {
     [SerializeField] private int height = 10;
     [SerializeField] private bool randomStartingPosition = true;
     [SerializeField] private bool randomEndingPosition = true;
+    [SerializeField] private PathNode _pathNodePrefab;
 
     [SerializeField] private Color startColor = Color.green;
     [SerializeField] private Color endColor = Color.red;
@@ -177,13 +178,13 @@ public class DijkstraAI : MonoBehaviour {
 
     private void CreatePathNodes(int x, int y)
     {
-		for(int i = 0; i < x; i++)
+        for (int i = 0; i < x; i++)
         {
-			for(int j = 0; j < y; j++)
+            for (int j = 0; j < y; j++)
             {
-				GameObject node = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                GameObject node = Instantiate(_pathNodePrefab.gameObject);
 				node.transform.position = new Vector3(i,j);
-				PathNode pathNode = node.AddComponent<PathNode>();
+                PathNode pathNode = node.GetComponent<PathNode>();
 				node.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
 			}
 		}
